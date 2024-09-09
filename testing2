@@ -1,11 +1,9 @@
---// test
-
-local NotificationLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/John142-dot/test/main/testing"))()
+local NotificationLibrary = loadstring(game:HttpGet("https://pastebin.com/raw/7PVpL2RU"))()
 
 NotificationLibrary:ShowNotification(
     "Hello, this is a test notification!", 
     "rbxassetid://3238007702",  -- Replace with your actual sound ID
     "rbxassetid://YOUR_IMAGE_ID", -- Replace with your actual image ID
     5, -- Duration in seconds
-    "https://yourcallbackurl.com" -- Replace with the URL you want to execute after the notification
+    "https://example.com/script.lua" -- Replace with the URL you want to execute after the notification
 )
