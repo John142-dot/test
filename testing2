@@ -1,6 +1,6 @@
 --// test
 
-local NotificationLibrary = loadstring(game:HttpGet("https://pastebin.com/raw/7PVpL2RU"))()
+local NotificationLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/John142-dot/test/main/testing"))()
 
 NotificationLibrary:ShowNotification(
     "Hello, this is a test notification!", 
