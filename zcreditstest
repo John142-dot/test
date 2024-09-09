@@ -1,7 +1,11 @@
 local ZCredits = {}
 
+-- Define colors
+local TEXT_COLOR = Color3.new(1, 1, 1) -- White text
+local BACKGROUND_COLOR_START = Color3.fromRGB(30, 30, 60) -- Dark blue background
+
 -- Create the GUI elements
-function ZCredits:CreateCreditsUI()
+function ZCredits:CreateCreditsUI(soundId, ownerImageId, contributorImageId, testerImageId)
     local Players = game:GetService("Players")
     local TweenService = game:GetService("TweenService")
     local SoundService = game:GetService("SoundService")
@@ -13,69 +17,74 @@ function ZCredits:CreateCreditsUI()
     -- Create Credits Frame
     local CreditsFrame = Instance.new("Frame")
     CreditsFrame.Size = UDim2.new(0.5, 0, 0.5, 0)
-    CreditsFrame.Position = UDim2.new(0.25, 0, 0.25, 0)
-    CreditsFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 60)
+    CreditsFrame.Position = UDim2.new(0.25, 0, 1.1, 0) -- Start off-screen
+    CreditsFrame.BackgroundColor3 = BACKGROUND_COLOR_START
     CreditsFrame.Parent = ScreenGui
 
-    -- Create UICorner for squircle design
+    -- Create a UICorner to give it a squircle shape
     local UICorner = Instance.new("UICorner")
     UICorner.CornerRadius = UDim.new(0.2, 0)
     UICorner.Parent = CreditsFrame
 
-    -- Add Credits Text Labels
-    local OwnerLabel = Instance.new("TextLabel")
-    OwnerLabel.Size = UDim2.new(1, 0, 0, 50)
-    OwnerLabel.Position = UDim2.new(0, 0, 0.1, 0)
-    OwnerLabel.TextColor3 = Color3.new(1, 1, 1)
-    OwnerLabel.BackgroundTransparency = 1
-    OwnerLabel.Parent = CreditsFrame
+    -- Function to create a label with an image
+    local function createLabelWithImage(text, position, imageId)
+        local label = Instance.new("TextLabel")
+        label.Size = UDim2.new(0.75, 0, 0, 50)
+        label.Position = position
+        label.TextColor3 = TEXT_COLOR
+        label.BackgroundTransparency = 1
+        label.Text = text
+        label.Parent = CreditsFrame
 
-    local ContributorsLabel = Instance.new("TextLabel")
-    ContributorsLabel.Size = UDim2.new(1, 0, 0, 50)
-    ContributorsLabel.Position = UDim2.new(0, 0, 0.3, 0)
-    ContributorsLabel.TextColor3 = Color3.new(1, 1, 1)
-    ContributorsLabel.BackgroundTransparency = 1
-    ContributorsLabel.Parent = CreditsFrame
+        local imageLabel = Instance.new("ImageLabel")
+        imageLabel.Size = UDim2.new(0.1, 0, 0.8, 0) -- Adjust size as needed
+        imageLabel.Position = UDim2.new(0.8, 0, 0.1, 0) -- Position next to the text
+        imageLabel.Image = imageId -- Set the image ID
+        imageLabel.BackgroundTransparency = 1
+        imageLabel.Parent = CreditsFrame
 
-    local TestersLabel = Instance.new("TextLabel")
-    TestersLabel.Size = UDim2.new(1, 0, 0, 50)
-    TestersLabel.Position = UDim2.new(0, 0, 0.5, 0)
-    TestersLabel.TextColor3 = Color3.new(1, 1, 1)
-    TestersLabel.BackgroundTransparency = 1
-    TestersLabel.Parent = CreditsFrame
-
-    -- Close Button
-    local CloseButton = Instance.new("TextButton")
-    CloseButton.Size = UDim2.new(0.1, 0, 0.1, 0)
-    CloseButton.Position = UDim2.new(0.9, 0, 0.05, 0)
-    CloseButton.Text = "X"
-    CloseButton.TextColor3 = Color3.fromRGB(255, 0, 0)
-    CloseButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    CloseButton.Parent = CreditsFrame
-
-    -- Sound setup
-    local sound = Instance.new("Sound")
-    sound.SoundId = "rbxassetid://YOUR_SOUND_ID" -- Replace with your sound ID
-    sound.Volume = 0.5
-    sound.Parent = SoundService
-
-    -- Play sound
-    sound:Play()
-
-    -- Function to close credits
-    local function closeCredits()
-        local slideTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
-        local slideTween = TweenService:Create(CreditsFrame, slideTweenInfo, {Position = UDim2.new(0.25, 0, 1, 0)})
-        slideTween:Play()
-        slideTween.Completed:Wait()
-        ScreenGui:Destroy()
+        return label, imageLabel
     end
 
-    -- Connect close button
-    CloseButton.MouseButton1Click:Connect(closeCredits)
+    -- Add default labels with placeholder images
+    self.OwnerLabel, self.OwnerImage = createLabelWithImage("Owner: YourName", UDim2.new(0, 0, 0.1, 0), ownerImageId)
+    self.ContributorsLabel, self.ContributorsImage = createLabelWithImage("Contributors: Contributor1, Contributor2", UDim2.new(0, 0, 0.3, 0), contributorImageId)
+    self.TestersLabel, self.TestersImage = createLabelWithImage("Testers: Tester1, Tester2", UDim2.new(0, 0, 0.5, 0), testerImageId)
 
-    -- Return labels for setting names
-    return OwnerLabel, ContributorsLabel, TestersLabel
+    -- Set up the OK Button
+    local OKButton = Instance.new("TextButton")
+    OKButton.Size = UDim2.new(0.2, 0, 0.1, 0)
+    OKButton.Position = UDim2.new(0.4, 0, 0.65, 0)
+    OKButton.Text = "OK"
+    OKButton.TextColor3 = Color3.fromRGB(0, 255, 0) -- Green text for the OK button
+    OKButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Dark background for the button
+    OKButton.Parent = CreditsFrame
+
+    -- Sound setup
+    self.sound = Instance.new("Sound")
+    self.sound.SoundId = soundId -- Set the sound ID
+    self.sound.Volume = 0.5
+    self.sound.Parent = SoundService
+
+    -- Play sound when credits GUI is displayed
+    self.sound:Play()
+
+    -- Tween the credits frame into view
+    local slideTweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local slideTween = TweenService:Create(CreditsFrame, slideTweenInfo, {Position = UDim2.new(0.25, 0, 0.25, 0)})
+    slideTween:Play()
+
+    -- Function to close the credits
+    local function closeCredits()
+        local slideTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
+        local slideTween = TweenService:Create(CreditsFrame, slideTweenInfo, {Position = UDim2.new(0.25, 0, 1.1, 0)})
+        slideTween:Play()
+        slideTween.Completed:Wait() -- Wait for the slide to finish
+        ScreenGui:Destroy() -- Destroy the GUI
+    end
+
+    -- Connect the OK button
+    OKButton.MouseButton1Click:Connect(closeCredits)
 end
 
 -- Function to set credit names
@@ -90,8 +99,8 @@ function ZCredits:SetCreditName(creditType, name)
 end
 
 -- Initialize the credits UI
-function ZCredits:Init()
-    self.OwnerLabel, self.ContributorsLabel, self.TestersLabel = self:CreateCreditsUI()
+function ZCredits:Init(soundId, ownerImageId, contributorImageId, testerImageId)
+    self:CreateCreditsUI(soundId, ownerImageId, contributorImageId, testerImageId)
 end
 
 return ZCredits
