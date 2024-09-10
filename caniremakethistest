@@ -1,0 +1,155 @@
+local library = {}
+
+function play(id)
+    for _, v in next, workspace:GetChildren() do
+        if v.Name == "GUISound" then
+            v:Destroy()
+        end
+    end
+    local Sound = Instance.new("Sound", workspace)
+    Sound.Name = "GUISound"
+    Sound.Volume = 6
+    Sound.SoundId = id
+    Sound:Play()
+end
+
+function library:CreateWindow(name, theme)
+    local themes = {
+        Normal = { Color3.fromRGB(32, 32, 32), Color3.fromRGB(26, 26, 26), Color3.fromRGB(176, 148, 255) },
+        Dark = { Color3.fromRGB(20, 20, 20), Color3.fromRGB(30, 30, 30), Color3.fromRGB(255, 0, 0) },
+        Light = { Color3.fromRGB(240, 240, 240), Color3.fromRGB(220, 220, 220), Color3.fromRGB(0, 0, 255) }
+    }
+
+    local selectedTheme = themes[theme] or themes.Normal
+
+    -- Create ScreenGui
+    local Screen = Instance.new("ScreenGui", game.Players.LocalPlayer:WaitForChild("PlayerGui"))
+    local MainFrame = Instance.new("Frame", Screen)
+    MainFrame.Size = UDim2.new(0, 400, 0, 300)
+    MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+    MainFrame.BackgroundColor3 = selectedTheme[1]
+
+    -- Create Title
+    local Title = Instance.new("TextLabel", MainFrame)
+    Title.Size = UDim2.new(1, 0, 0, 30)
+    Title.Text = name
+    Title.BackgroundColor3 = selectedTheme[1]
+    Title.TextColor3 = selectedTheme[3]
+    Title.TextScaled = true
+
+    -- Create Tab Container
+    local TabContainer = Instance.new("Frame", MainFrame)
+    TabContainer.Size = UDim2.new(1, 0, 1, -30)
+    TabContainer.Position = UDim2.new(0, 0, 0, 30)
+    TabContainer.BackgroundColor3 = selectedTheme[2]
+
+    local Tabs = Instance.new("Frame", MainFrame)
+    Tabs.Size = UDim2.new(1, 0, 0, 30)
+    Tabs.Position = UDim2.new(0, 0, 0, 30)
+    Tabs.BackgroundColor3 = selectedTheme[1]
+
+    local TabButtons = {}
+
+    function TabButtons:CreateTab(tabName)
+        local TabButton = Instance.new("TextButton", Tabs)
+        TabButton.Size = UDim2.new(0, 100, 0, 30)
+        TabButton.Text = tabName
+        TabButton.BackgroundColor3 = selectedTheme[1]
+        TabButton.TextColor3 = selectedTheme[3]
+
+        local TabFrame = Instance.new("Frame", TabContainer)
+        TabFrame.Size = UDim2.new(1, 0, 1, 0)
+        TabFrame.BackgroundColor3 = selectedTheme[2]
+        TabFrame.Visible = false
+
+        TabButton.MouseButton1Click:Connect(function()
+            for _, frame in pairs(TabContainer:GetChildren()) do
+                if frame:IsA("Frame") then
+                    frame.Visible = false
+                end
+            end
+            TabFrame.Visible = true
+        end)
+
+        return {
+            CreateButton = function(buttonText, callback)
+                local Button = Instance.new("TextButton", TabFrame)
+                Button.Size = UDim2.new(0, 200, 0, 50)
+                Button.Text = buttonText
+                Button.BackgroundColor3 = selectedTheme[1]
+                Button.TextColor3 = selectedTheme[3]
+
+                Button.MouseButton1Click:Connect(function()
+                    pcall(callback)
+                    play("rbxassetid://178104975")
+                end)
+            end,
+
+            CreateToggle = function(toggleText, callback)
+                local ToggleFrame = Instance.new("Frame", TabFrame)
+                ToggleFrame.Size = UDim2.new(0, 200, 0, 50)
+                ToggleFrame.BackgroundColor3 = selectedTheme[2]
+
+                local ToggleButton = Instance.new("TextButton", ToggleFrame)
+                ToggleButton.Size = UDim2.new(0, 50, 0, 50)
+                ToggleButton.Text = "OFF"
+                ToggleButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+                ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+                local enabled = false
+                ToggleButton.MouseButton1Click:Connect(function()
+                    enabled = not enabled
+                    ToggleButton.Text = enabled and "ON" or "OFF"
+                    ToggleButton.BackgroundColor3 = enabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
+                    pcall(callback, enabled)
+                end)
+
+                local Label = Instance.new("TextLabel", ToggleFrame)
+                Label.Size = UDim2.new(0, 150, 0, 50)
+                Label.Position = UDim2.new(0, 60, 0, 0)
+                Label.Text = toggleText
+                Label.BackgroundColor3 = selectedTheme[2]
+                Label.TextColor3 = selectedTheme[3]
+            end,
+
+            CreateDropdown = function(dropdownText, options, callback)
+                local DropdownFrame = Instance.new("Frame", TabFrame)
+                DropdownFrame.Size = UDim2.new(0, 200, 0, 50)
+                DropdownFrame.BackgroundColor3 = selectedTheme[2]
+
+                local DropdownButton = Instance.new("TextButton", DropdownFrame)
+                DropdownButton.Size = UDim2.new(1, 0, 1, 0)
+                DropdownButton.Text = dropdownText
+                DropdownButton.BackgroundColor3 = selectedTheme[1]
+                DropdownButton.TextColor3 = selectedTheme[3]
+
+                local DropdownList = Instance.new("Frame", DropdownFrame)
+                DropdownList.Size = UDim2.new(1, 0, 0, 0)
+                DropdownList.BackgroundColor3 = selectedTheme[2]
+                DropdownList.Visible = false
+
+                for _, option in ipairs(options) do
+                    local OptionButton = Instance.new("TextButton", DropdownList)
+                    OptionButton.Size = UDim2.new(1, 0, 0, 30)
+                    OptionButton.Text = option
+                    OptionButton.BackgroundColor3 = selectedTheme[1]
+                    OptionButton.TextColor3 = selectedTheme[3]
+
+                    OptionButton.MouseButton1Click:Connect(function()
+                        DropdownButton.Text = option
+                        callback(option)
+                        DropdownList.Visible = false
+                    end)
+                end
+
+                DropdownButton.MouseButton1Click:Connect(function()
+                    DropdownList.Visible = not DropdownList.Visible
+                end)
+            end,
+        }
+    end
+
+    return TabButtons
+end
+
+return library
