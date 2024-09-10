@@ -1,8 +1,10 @@
 local ZCredits = {}
 
--- Define colors
+-- Define colors and size
 local TEXT_COLOR = Color3.new(1, 1, 1) -- White text
 local BACKGROUND_COLOR_START = Color3.fromRGB(30, 30, 60) -- Dark blue background
+local BACKGROUND_COLOR_END = Color3.fromRGB(60, 60, 90) -- Lighter blue background
+local GUI_SIZE = UDim2.new(0, 300, 0, 200) -- Size of the GUI
 
 -- Create the GUI elements
 function ZCredits:CreateCreditsUI(soundId, ownerImageId, contributorImageId, testerImageId)
@@ -16,8 +18,8 @@ function ZCredits:CreateCreditsUI(soundId, ownerImageId, contributorImageId, tes
 
     -- Create Credits Frame
     local CreditsFrame = Instance.new("Frame")
-    CreditsFrame.Size = UDim2.new(0.5, 0, 0.5, 0)
-    CreditsFrame.Position = UDim2.new(0.25, 0, 1.1, 0) -- Start off-screen
+    CreditsFrame.Size = GUI_SIZE
+    CreditsFrame.Position = UDim2.new(0.5, -150, 1.1, 0) -- Centered horizontally, start off-screen
     CreditsFrame.BackgroundColor3 = BACKGROUND_COLOR_START
     CreditsFrame.Parent = ScreenGui
 
@@ -51,13 +53,14 @@ function ZCredits:CreateCreditsUI(soundId, ownerImageId, contributorImageId, tes
     self.ContributorsLabel, self.ContributorsImage = createLabelWithImage("Contributors: Contributor1, Contributor2", UDim2.new(0, 0, 0.3, 0), contributorImageId)
     self.TestersLabel, self.TestersImage = createLabelWithImage("Testers: Tester1, Tester2", UDim2.new(0, 0, 0.5, 0), testerImageId)
 
-    -- Set up the OK Button
+    -- Set up the OK Button (styled as text)
     local OKButton = Instance.new("TextButton")
     OKButton.Size = UDim2.new(0.2, 0, 0.1, 0)
-    OKButton.Position = UDim2.new(0.4, 0, 0.65, 0)
+    OKButton.Position = UDim2.new(0.4, 0, 0.75, 0) -- Position below the labels
     OKButton.Text = "OK"
     OKButton.TextColor3 = Color3.fromRGB(0, 255, 0) -- Green text for the OK button
-    OKButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Dark background for the button
+    OKButton.BackgroundTransparency = 1 -- No background
+    OKButton.BorderSizePixel = 0 -- No border
     OKButton.Parent = CreditsFrame
 
     -- Sound setup
@@ -71,13 +74,13 @@ function ZCredits:CreateCreditsUI(soundId, ownerImageId, contributorImageId, tes
 
     -- Tween the credits frame into view
     local slideTweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-    local slideTween = TweenService:Create(CreditsFrame, slideTweenInfo, {Position = UDim2.new(0.25, 0, 0.25, 0)})
+    local slideTween = TweenService:Create(CreditsFrame, slideTweenInfo, {Position = UDim2.new(0.5, -150, 0.25, 0)})
     slideTween:Play()
 
     -- Function to close the credits
     local function closeCredits()
         local slideTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
-        local slideTween = TweenService:Create(CreditsFrame, slideTweenInfo, {Position = UDim2.new(0.25, 0, 1.1, 0)})
+        local slideTween = TweenService:Create(CreditsFrame, slideTweenInfo, {Position = UDim2.new(0.5, -150, 1.1, 0)})
         slideTween:Play()
         slideTween.Completed:Wait() -- Wait for the slide to finish
         ScreenGui:Destroy() -- Destroy the GUI
